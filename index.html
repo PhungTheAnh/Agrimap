@@ -107,8 +107,8 @@
         el.style.width = marker.properties.iconSize[0] + "px";
         el.style.height = marker.properties.iconSize[1] + "px";
 
-        el.addEventListener("click", function () {
-          window.alert(marker.properties.message);
+        el.addEventListener("click", function (e) {
+          // window.alert(marker.properties.message);
         });
 
         // add marker to map
@@ -187,6 +187,38 @@
           layout: {},
           paint: {
             "fill-color": "#FF9C95",
+            "fill-opacity": 0.3,
+          },
+        });
+      });
+      map.on("load", function () {
+        map.addSource("yellow", {
+          type: "geojson",
+          data: {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [105.7944, 21.0283],
+                  [105.7934, 21.02623],
+                  [105.7902, 21.0233],
+                  [105.7925, 21.0192],
+                  [105.79896, 21.0229],
+                  [105.7975, 21.0248],
+                  [105.7984, 21.0269],
+                ],
+              ],
+            },
+          },
+        });
+        map.addLayer({
+          id: "yellow",
+          type: "fill",
+          source: "yellow",
+          layout: {},
+          paint: {
+            "fill-color": "#FFC53D",
             "fill-opacity": 0.3,
           },
         });
