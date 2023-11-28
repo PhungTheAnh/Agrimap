@@ -28,6 +28,7 @@
   <body>
     <style>
       .marker {
+        position: relative;
         display: block;
         border: none;
         border-radius: 50%;
@@ -44,98 +45,79 @@
         bottom: 0;
         width: 100%;
       }
+      .map-group {
+        flex-direction: column;
+        justify-content: start;
+        gap: 4px;
+      }
+      .map-title {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+      }
+      .map-quantity {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        padding-left: 1px;
+        list-style-type: disc;
+        margin: 0;
+      }
+      .title-text {
+        margin: 0;
+        color: #434343;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px; /* 150% */
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        max-width: 200px;
+      }
+      .quantity-text {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        gap: 4px;
+        margin: 0;
+        color: #434343;
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 20px; /* 166.667% */
+      }
+      .quantity-span {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     </style>
 
     <div id="map"></div>
-
     <script>
-      goongjs.accessToken = "wnicbAmnNkoMHNYUKWnlFHezV189FjmMwkNJ7hKW";
-      var map = new goongjs.Map({
-        container: "map",
-        style: "https://tiles.goong.io/assets/goong_map_web.json",
-        center: [105.79469434267557, 21.020742618136055],
-        zoom: 14,
-        antialias: true,
-      });
-      // add markers to map
-      var geojson = {
+      const iconLocation = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.7466 9.63332C17.0466 6.55332 14.3599 5.16666 11.9999 5.16666C11.9999 5.16666 11.9999 5.16666 11.9933 5.16666C9.63994 5.16666 6.94661 6.54666 6.24661 9.62666C5.46661 13.0667 7.57328 15.98 9.47994 17.8133C10.1866 18.4933 11.0933 18.8333 11.9999 18.8333C12.9066 18.8333 13.8133 18.4933 14.5133 17.8133C16.4199 15.98 18.5266 13.0733 17.7466 9.63332ZM11.9999 12.9733C10.8399 12.9733 9.89994 12.0333 9.89994 10.8733C9.89994 9.71332 10.8399 8.77332 11.9999 8.77332C13.1599 8.77332 14.0999 9.71332 14.0999 10.8733C14.0999 12.0333 13.1599 12.9733 11.9999 12.9733Z" fill="#0E883D"/>
+      </svg>`;
+      const iconCar = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 9.33334H8.66667C9.4 9.33334 10 8.73334 10 8.00001V1.33334H4C3 1.33334 2.12667 1.88667 1.67334 2.7" stroke="#434343" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M1.33337 11.3333C1.33337 12.44 2.22671 13.3333 3.33337 13.3333H4.00004C4.00004 12.6 4.60004 12 5.33337 12C6.06671 12 6.66671 12.6 6.66671 13.3333H9.33337C9.33337 12.6 9.93337 12 10.6667 12C11.4 12 12 12.6 12 13.3333H12.6667C13.7734 13.3333 14.6667 12.44 14.6667 11.3333V9.33334H12.6667C12.3 9.33334 12 9.03334 12 8.66668V6.66668C12 6.30001 12.3 6.00001 12.6667 6.00001H13.5267L12.3867 4.00668C12.1467 3.59335 11.7067 3.33334 11.2267 3.33334H10V8.00001C10 8.73334 9.40004 9.33334 8.66671 9.33334H8.00004" stroke="#434343" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M5.33333 14.6667C6.06971 14.6667 6.66667 14.0697 6.66667 13.3333C6.66667 12.597 6.06971 12 5.33333 12C4.59695 12 4 12.597 4 13.3333C4 14.0697 4.59695 14.6667 5.33333 14.6667Z" stroke="#434343" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M10.6667 14.6667C11.4031 14.6667 12 14.0697 12 13.3333C12 12.597 11.4031 12 10.6667 12C9.93033 12 9.33337 12.597 9.33337 13.3333C9.33337 14.0697 9.93033 14.6667 10.6667 14.6667Z" stroke="#434343" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M14.6667 8V9.33333H12.6667C12.3 9.33333 12 9.03333 12 8.66667V6.66667C12 6.3 12.3 6 12.6667 6H13.5267L14.6667 8Z" stroke="#434343" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M1.33337 5.33334H5.33337" stroke="#434343" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M1.33337 7.33334H4.00004" stroke="#434343" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M1.33337 9.33334H2.66671" stroke="#434343" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`;
+      const iconDot = `<svg width="4" height="5" viewBox="0 0 4 5" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2 4.39773C1.65625 4.39773 1.34233 4.31392 1.05824 4.14631C0.774148 3.97585 0.546875 3.74858 0.37642 3.46449C0.208807 3.1804 0.125 2.86648 0.125 2.52273C0.125 2.17614 0.208807 1.86222 0.37642 1.58097C0.546875 1.29687 0.774148 1.07102 1.05824 0.903409C1.34233 0.732954 1.65625 0.647727 2 0.647727C2.34659 0.647727 2.66051 0.732954 2.94176 0.903409C3.22585 1.07102 3.4517 1.29687 3.61932 1.58097C3.78977 1.86222 3.875 2.17614 3.875 2.52273C3.875 2.86648 3.78977 3.1804 3.61932 3.46449C3.4517 3.74858 3.22585 3.97585 2.94176 4.14631C2.66051 4.31392 2.34659 4.39773 2 4.39773Z" fill="#434343"/>
+      </svg>`;
+      // add data GeoJson
+      var dataGeo = {
         type: "FeatureCollection",
         features: [
           {
-            type: "Feature",
-            properties: {
-              message: "Foo",
-              iconSize: [60, 60],
-            },
-            geometry: {
-              type: "Point",
-              coordinates: [105.78903, 21.02524],
-            },
-          },
-          {
-            type: "Feature",
-            properties: {
-              message: "Bar",
-              iconSize: [50, 50],
-            },
-            geometry: {
-              type: "Point",
-              coordinates: [105.79553, 21.03027],
-            },
-          },
-          {
-            type: "Feature",
-            properties: {
-              message: "Baz",
-              iconSize: [40, 40],
-            },
-            geometry: {
-              type: "Point",
-              coordinates: [105.79621, 21.00963],
-            },
-          },
-        ],
-      };
-      geojson.features.forEach(function (marker) {
-        // create a DOM element for the marker
-        var el = document.createElement("div");
-        el.className = "marker";
-        el.style.backgroundImage =
-          "url(https://placekitten.com/g/" +
-          marker.properties.iconSize.join("/") +
-          "/)";
-        el.style.width = marker.properties.iconSize[0] + "px";
-        el.style.height = marker.properties.iconSize[1] + "px";
-
-        el.addEventListener("click", function (e) {
-          // window.alert(marker.properties.message);
-        });
-
-        // add marker to map
-        new goongjs.Marker(el)
-          .setLngLat(marker.geometry.coordinates)
-          .addTo(map);
-      });
-      //add control maps
-      // add zoom
-      var zoom = new goongjs.NavigationControl({
-        showCompass: false, // Ẩn button la bàn
-      });
-      // add local
-      var getLocal = new goongjs.GeolocateControl({
-        positionOptions: {
-          enableHighAccuracy: true, // Bật chế độ định vị với độ chính xác cao
-        },
-        trackUserLocation: false,
-        showUserLocation: true,
-      });
-      map.addControl(getLocal, "bottom-right");
-      map.addControl(zoom, "bottom-right");
-      // Add a GeoJSON polygon
-      map.on("load", function () {
-        map.addSource("green", {
-          type: "geojson",
-          data: {
             type: "Feature",
             geometry: {
               type: "Polygon",
@@ -150,6 +132,170 @@
               ],
             },
           },
+          {
+            type: "Feature",
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [-121.37881303595779, 38.39168793390614],
+                  [-121.37881303595779, 38.39168793390614],
+                  [-121.37881303595779, 38.39168793390614],
+                  [-121.42144609259859, 38.3858743352733],
+                  [-121.48040890184362, 38.39168793390614],
+                  [-121.51616899298959, 38.444811306302185],
+                  [-121.58203060594559, 38.4678848333205],
+                  [-121.5930118478076, 38.626428127591964],
+                  [-121.46772233771595, 38.671102403308296],
+                  [-121.39491024461671, 38.75068410903778],
+                  [-121.31532853888723, 38.82349620213702],
+                  [-121.23913163947286, 38.82349620213702],
+                  [-121.19226111538413, 38.73701569269657],
+                  [-121.13750993537089, 38.65836416274834],
+                  [-121.19386308478518, 38.61312144627681],
+                  [-121.26453060594432, 38.58219310155013],
+                  [-121.32057369676485, 38.53666616470099],
+                  [-121.37881303595779, 38.4933096380081],
+                  [-121.37062232143953, 38.43667226821621],
+                  [-121.37881303595779, 38.39168793390614],
+                ],
+              ],
+            },
+          },
+        ],
+      };
+      // add map
+      goongjs.accessToken = "wnicbAmnNkoMHNYUKWnlFHezV189FjmMwkNJ7hKW";
+      var map = new goongjs.Map({
+        container: "map",
+        style: "https://tiles.goong.io/assets/goong_map_web.json",
+        center: [105.79469434267557, 21.020742618136055],
+        zoom: 4,
+        antialias: true,
+      });
+      // add markers to map
+      var geojson = {
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            properties: {
+              message: "Động vật sống họ trâu bò",
+              iconSize: [50, 50],
+              title: "Động vật sống họ trâu bò",
+              quantity: "300 đơn rao bán",
+            },
+            geometry: {
+              type: "Point",
+              coordinates: [105.79773, 21.03007],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {
+              message: "Động vật sống họ bò sát",
+              iconSize: [50, 50],
+              title: "Động vật sống họ bò sát",
+              quantity: "400 đơn rao bán",
+            },
+            geometry: {
+              type: "Point",
+              coordinates: [105.79153, 21.03027],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {
+              message: "Động vật có cánh",
+              iconSize: [50, 50],
+              title: "Động vật có cánh",
+              quantity: "500 đơn rao bán",
+            },
+            geometry: {
+              type: "Point",
+              coordinates: [105.79621, 21.00963],
+            },
+          },
+          {
+            type: "Feature",
+            properties: {
+              message:
+                "Động vật có tên dài vãi cả chưởng ra nó lên đến tận một trăm",
+              iconSize: [50, 50],
+              title:
+                "Động vật có tên dài vãi cả chưởng ra nó lên đến tận một trăm",
+              quantity: "600 đơn rao bán",
+            },
+            geometry: {
+              type: "Point",
+              coordinates: [105.79421, 21.02363],
+            },
+          },
+        ],
+      };
+      geojson.features.forEach(function (marker) {
+        // add icon
+        var el = document.createElement("div");
+        el.className = "marker";
+        el.style.backgroundImage =
+          "url(https://placekitten.com/g/" +
+          marker.properties.iconSize.join("/") +
+          "/)";
+        el.style.width = marker.properties.iconSize[0] + "px";
+        el.style.height = marker.properties.iconSize[1] + "px";
+        // add group
+        var dv = document.createElement("div");
+        dv.className = "map-group";
+        dv.innerHTML = `
+        <div class="map-title">
+          ${iconLocation}
+          <p class="title-text">${marker.properties.title}</p>
+        </div>
+        <div class="map-quantity">
+          <p class="quantity-text"><span class="quantity-span">${iconDot}</span>${iconCar}${marker.properties.quantity}</p>
+        </div>`;
+        el.addEventListener("click", function (e) {
+          // window.alert(marker.properties.message);
+          // map.zoomTo(14, { duration: 3000 });
+        });
+        // create the popup
+        var popup = new goongjs.Popup({ offset: 25 }).setHTML(
+          `<div class="map-title">
+          ${iconLocation}
+          <p class="title-text">${marker.properties.title}</p>
+        </div>
+        <div class="map-quantity">
+          <p class="quantity-text"><span class="quantity-span">${iconDot}</span>${iconCar}${marker.properties.quantity}</p>
+        </div>`
+        );
+        // add marker to map
+        new goongjs.Marker(dv)
+          .setLngLat(marker.geometry.coordinates)
+          .addTo(map);
+        new goongjs.Marker(el)
+          .setLngLat(marker.geometry.coordinates)
+          .setPopup(popup)
+          .addTo(map);
+      });
+      //add control maps
+      var zoom = new goongjs.NavigationControl({
+        showCompass: false, // hidden button la bàn
+      });
+      var getLocal = new goongjs.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true, // Bật chế độ định vị với độ chính xác cao
+        },
+        trackUserLocation: false,
+        showUserLocation: true,
+      });
+      map.addControl(getLocal, "bottom-right");
+      map.addControl(zoom, "bottom-right");
+      map.zoomTo(14, { duration: 3000 });
+      // Add a GeoJSON polygon
+      map.on("load", function () {
+        map.addSource("green", {
+          type: "geojson",
+          data: dataGeo,
         });
         map.addLayer({
           id: "green",
@@ -222,6 +368,42 @@
             "fill-opacity": 0.3,
           },
         });
+      });
+      // Event
+      const openGroup = () => {
+        mapGrs.forEach((e) => {
+          e.style.position = "relative";
+        });
+        // iconMarker.forEach((e) => {
+        //   e.style.position = "absolute";
+        // });
+        iconMarker[0].style.position = "absolute";
+      };
+      const removeGroup = () => {
+        mapGrs.forEach((e) => {
+          e.style.position = "absolute";
+        });
+        iconMarker.forEach((e) => {
+          e.style.position = "relative";
+        });
+      };
+      const openGroup1 = () => {
+        iconMarker[0].style.position = "absolute !important";
+      };
+      const removeGroup1 = () => {
+        iconMarker[0].style.position = "relative !important";
+      };
+      const mapGrs = document.querySelectorAll(".map-group");
+      const iconMarker = document.querySelectorAll(".marker");
+      map.on("zoom", (event) => {
+        console.log(map.getZoom());
+        if (map.getZoom() < 14.92) {
+          openGroup();
+        } else removeGroup();
+
+        // if (map.getZoom() < 8) {
+        //   openGroup1();
+        // } else removeGroup1();
       });
     </script>
   </body>
